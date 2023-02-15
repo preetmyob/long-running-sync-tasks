@@ -2,7 +2,7 @@ namespace hello_api;
 
 public interface IBackgroundTaskQueue
 {
-    Task EnqueueAsync(Task t);
-    Task<Task> DequeueAsync();
+    Task EnqueueAsync(Task<WorkItem> t);
+    Task<Task<WorkItem>> DequeueAsync();
     int Count { get; }
 }
