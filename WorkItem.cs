@@ -12,7 +12,7 @@ namespace hello_api
         public async Task<WorkItem> CreateLongRunningTask()
         {
             Console.WriteLine("Starting:{0}", this.Id);
-            await Task.Delay(1000);
+            await Task.Delay(10000);
             Console.WriteLine("Finishing:{0}", this.Id);
             return new WorkItem();
         }
