@@ -2,25 +2,20 @@ namespace hello_api
 {
     public class WorkItem
     {
-        private ILogger<WorkItem>? _Logger;
+        public Guid Id { get; init; }
 
-        public WorkItem(Guid? id = default, ILogger<WorkItem>? logger = default)
+        public WorkItem()
         {
-            _Logger = logger;
-            Id = id ?? Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
-        public Guid Id { get; init; }
-        public static WorkItem Empty { get; } = new WorkItem(Guid.Empty);
-
-        public Task<WorkItem> CreateLongRunningTask()
+        public Task CreateLongRunningTask()
         {
-            var longRunningTask = new Task<WorkItem>( async () =>
+            var longRunningTask = new Task( async () =>
                 {
-                    _Logger.LogInformation("Starting:{Id}", this.Id);
+                    Console.WriteLine("Starting:{0}", this.Id);
                     await Task.Delay(1000);
-                    _Logger.LogInformation("Finishing:{Id}", this.Id);
-                    return  this;
+                    Console.WriteLine("Finishing:{0}", this.Id);
                 }
             );
             return longRunningTask;

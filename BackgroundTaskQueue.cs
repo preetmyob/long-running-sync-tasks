@@ -6,23 +6,24 @@ namespace hello_api;
 [DebuggerDisplay("BackgroundTaskQueue ({Count})")] 
 public class BackgroundTaskQueue : IBackgroundTaskQueue
 {
-    private readonly Channel<Task<WorkItem>> _channel = Channel.CreateUnbounded<Task<WorkItem>>();
-    public async Task EnqueueAsync(Task<WorkItem> t)
+    private readonly Channel<Task> _channel = Channel.CreateUnbounded<Task>();
+
+    public async Task EnqueueAsync(Task t)
     {
         await _channel.Writer.WriteAsync(t);
     }
 
-    public async Task<Task<WorkItem>> DequeueAsync()
+    public async Task<Task> DequeueAsync()
     {
         while(await _channel.Reader.WaitToReadAsync())
         {
-            if (_channel.Reader.TryRead(out Task<WorkItem>? workItemTask))
+            if (_channel.Reader.TryRead(out Task? workItemTask))
             {
                 return workItemTask;
             }
         }
-
-        return Task<WorkItem>.FromResult(WorkItem.Empty);
+        
+        return Task.FromResult(new WorkItem());
     }
 
     public int Count => _channel.Reader.Count;

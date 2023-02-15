@@ -9,9 +9,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IBackgroundTaskQueue , BackgroundTaskQueue>();
 
-// builder.Services.AddTransient<IBackgroundTaskQueue, BackgroundTaskQueue>();
-// builder.Services.AddScoped<Func<IBackgroundTaskQueue>>(
-//     services => () => services.GetService<IBackgroundTaskQueue>()!); 
+builder.Services.AddTransient<WorkItem>();
+builder.Services.AddScoped<Func<WorkItem>>(
+services => () => services.GetService<WorkItem>()!); 
 
 builder.Services.AddHostedService<TaskProcessorService>();
 

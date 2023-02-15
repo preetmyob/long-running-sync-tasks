@@ -8,19 +8,21 @@ public class MyController : Controller
 {
     private readonly IBackgroundTaskQueue  _longLivingWorkQueue;
     private readonly ILogger<MyController> _logger;
+    private readonly Func<WorkItem> _workItemFactory;
 
-    public MyController(IBackgroundTaskQueue longLivingWorkQueue, ILogger<MyController> logger)
+    public MyController(IBackgroundTaskQueue longLivingWorkQueue, ILogger<MyController> logger, Func<WorkItem> workItemFactory)
     {
         _longLivingWorkQueue = longLivingWorkQueue;
         _logger = logger;
+        _workItemFactory = workItemFactory;
     }
 
     [HttpPut]
     [Route("UpdateRoute")]
     public async Task<IActionResult> UpdateRoute([FromBody]int _)
     {
-        var workItem = new WorkItem();
-        // _logger.LogInformation("Enqueue {Id}", workItem.Id);
+        var workItem = _workItemFactory();
+        _logger.LogInformation("Enqueue {Id}", workItem.Id);
         await _longLivingWorkQueue.EnqueueAsync(workItem.CreateLongRunningTask());
         return Ok();
     }
