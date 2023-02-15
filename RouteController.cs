@@ -19,19 +19,9 @@ public class MyController : Controller
     [Route("UpdateRoute")]
     public async Task<IActionResult> UpdateRoute([FromBody]int _)
     {
-        Guid id = Guid.NewGuid();
-        _logger.LogInformation("New Job {Id}", id);
-        await _longLivingWorkQueue.EnqueueAsync(CreateTheLongRunningTask(id));
+        var workItem = new WorkItem();
+        // _logger.LogInformation("Enqueue {Id}", workItem.Id);
+        await _longLivingWorkQueue.EnqueueAsync(workItem.CreateLongRunningTask());
         return Ok();
-    }
-
-    private Task CreateTheLongRunningTask(Guid id)
-    {
-        return new Task(async () =>
-        {
-            _logger.LogInformation("Starting:{Id}", id);
-            await Task.Delay(1000);
-            _logger.LogInformation("Finishing:{Id}", id);
-        });
     }
 }
