@@ -1,5 +1,5 @@
 #!/bin/bash
-for i in {1..10000}; do
+for i in {1..1000000}; do
     echo $i
     curl -X 'PUT' \
     'https://localhost:7206/api/My/UpdateRoute' \

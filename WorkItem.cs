@@ -2,19 +2,22 @@ namespace hello_api
 {
     public class WorkItem
     {
-        public Guid Id { get; init; }
+        private static readonly Random Rnd = new();
+        private static int _idGen = 0;
+        public int Id { get; init; }
+
+        public int Delay { get; set; } = Rnd.Next(10, 60);
 
         public WorkItem()
         {
-            Id = Guid.NewGuid();
+            Id = ++_idGen;
         }
 
         public async Task<WorkItem> CreateLongRunningTask()
         {
-            Console.WriteLine("Starting:{0}", this.Id);
-            await Task.Delay(10000);
-            Console.WriteLine("Finishing:{0}", this.Id);
-            return new WorkItem();
+            await Task.Delay(Delay * 1000);
+            Console.WriteLine("Task:{0} took {1}s", this.Id, Delay);
+            return this;
         }
     }
 }

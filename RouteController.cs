@@ -22,7 +22,7 @@ public class MyController : Controller
     public async Task<IActionResult> UpdateRoute([FromBody]int _)
     {
         var workItem = _workItemFactory();
-        _logger.LogInformation("Enqueue {Id}", workItem.Id);
+        _logger.LogInformation("Enqueue {Id} should take {secs}s", workItem.Id, workItem.Delay);
         await _longLivingWorkQueue.EnqueueAsync(workItem.CreateLongRunningTask());
         return Ok();
     }

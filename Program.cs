@@ -9,7 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IBackgroundTaskQueue , BackgroundTaskQueue>();
 
-builder.Services.AddTransient<WorkItem>();
+builder.Services.AddTransient<WorkItem>();git 
 builder.Services.AddScoped<Func<WorkItem>>(
 services => () => services.GetService<WorkItem>()!); 
 
