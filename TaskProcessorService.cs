@@ -40,14 +40,14 @@ public class TaskProcessorService : BackgroundService
             
             /* TODO how to handle cancellations */
             
-            // if it's a workItem then remove it from to be done and move to Done for later use
+            // If it's a new workitem task add it to the list of `in progress owrkitem tasks`.
             if (someFinishedTask == dequeueATaskOfWorkitemTask)
             {
                 // Grab the task created by the CreateLongRunningTask as the result of the dequeue operation
                 var workItemInProgress = dequeueATaskOfWorkitemTask.Result;
                 workItemsTasksInProgress.Add(workItemInProgress);
             }
-            else
+            else // it's a completed work item task so deal with it's completion.
             {
                 // remove from the tasksInProgress
                 var theFinishedWorkItemTask = (Task<WorkItem>)someFinishedTask;
