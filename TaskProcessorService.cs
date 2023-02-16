@@ -6,8 +6,8 @@ public class TaskProcessorService : BackgroundService
 {
     private readonly IBackgroundTaskQueue _queue;
     private readonly ILogger<MyController> _logger;
-    List<Task> workItemsToDo = new();
-    List<Task> workItemsDone = new();
+    private List<Task<WorkItem>> workItemsTasksInProgress = new();
+    private List<WorkItem> workItemsDone = new();
 
     
     public TaskProcessorService(IBackgroundTaskQueue queue, ILogger<MyController> logger)
@@ -26,29 +26,38 @@ public class TaskProcessorService : BackgroundService
     {
         do
         {
-            var newItemTask = _queue.DequeueAsync();
+            // Grab a list of the items in progress but just as generic Task not as Task<WorkItem> 
+            var itemsInProgress = workItemsTasksInProgress.Cast<Task>();
             
-            var tasksToWaitFor = workItemsToDo.Append(newItemTask).ToArray();
-            // wait for one of list of jobs to complete
-            var finishedTask = await Task.WhenAny(tasksToWaitFor);
+            // now add add the dequeuing task to this list
+            var dequeueATaskOfWorkitemTask = _queue.DequeueAsync();
+            var tasksToWaitFor = itemsInProgress.Append(dequeueATaskOfWorkitemTask).ToArray();
+            
+            // wait for for either a dequeue completion event (new item arrived) or 
+            // one of te workItem tasks finishing.
+            var someFinishedTask = await Task.WhenAny(tasksToWaitFor);
 
             
             /* TODO how to handle cancellations */
             
             // if it's a workItem then remove it from to be done and move to Done for later use
-            if (finishedTask != newItemTask)
+            if (someFinishedTask == dequeueATaskOfWorkitemTask)
             {
-                if(workItemsToDo.Remove(finishedTask))
-                {
-                    workItemsDone.Add(finishedTask);
-                }
+                // Grab the task created by the CreateLongRunningTask as the result of the dequeue operation
+                var workItemInProgress = dequeueATaskOfWorkitemTask.Result;
+                workItemsTasksInProgress.Add(workItemInProgress);
             }
-            else // if it's a new workItem then add it the to be done list
+            else
             {
-                var workItemToDo = finishedTask;
-                workItemsToDo.Add(workItemToDo);
+                // remove from the tasksInProgress
+                var theFinishedWorkItemTask = (Task<WorkItem>)someFinishedTask;
+                workItemsTasksInProgress.Remove(theFinishedWorkItemTask);
+                
+                // add the finished workItem to the done list
+                var theFinishedWorkItem = theFinishedWorkItemTask.Result;
+                workItemsDone.Add(theFinishedWorkItem);
+                Console.WriteLine($"Summary from finished workItem {theFinishedWorkItem.Summary}");
             }
-
         } while (true);
     }
 

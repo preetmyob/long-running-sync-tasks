@@ -16,8 +16,9 @@ namespace hello_api
         public async Task<WorkItem> CreateLongRunningTask()
         {
             await Task.Delay(Delay * 1000);
-            Console.WriteLine("Task:{0} took {1}s", this.Id, Delay);
             return this;
         }
+
+        public string Summary => $"Task:{Id} with a delay of {Delay}s";
     }
 }
